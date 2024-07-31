@@ -4,6 +4,9 @@
   let isLoading = true;
   let items = [];
   let filteredItems = [];
+  let dropdownOpen = false;
+  let activeSort = 'default'; // Tracks the current sorting option
+  let activeCategory = ''; // Tracks the current category option
 
   onMount(async () => {
     const response = await fetch('https://fakestoreapi.com/products');
@@ -11,37 +14,58 @@
     products = data;
     isLoading = false;
     items = data;
-    filteredItems = items; // Display all items initially
+    filteredItems = [...items]; // Display all items initially
   });
 
-  function sortItems(category) {
-    filteredItems = items.filter(item => item.category.toLowerCase() === category);
+  function sortItems(option, sortBy) {
+    if (option === 'default') {
+      filteredItems = [...items];
+    } else if (option === 'category') {
+      filteredItems = items.filter(item => item.category.toLowerCase() === sortBy.toLowerCase());
+    } else if (option === 'price') {
+      if (sortBy === 'highToLow') {
+        filteredItems = [...items].sort((a, b) => b.price - a.price);
+      } else if (sortBy === 'lowToHigh') {
+        filteredItems = [...items].sort((a, b) => a.price - b.price);
+      }
+    }
+    activeSort = option; // Update the active sort option
+    activeCategory = sortBy; // Update the active category or price sorting
+    dropdownOpen = false; // Close the dropdown after selection
   }
 
+  function toggleDropdown() {
+    dropdownOpen = !dropdownOpen;
+  }
 </script>
+
+
 <nav class="navbar">
   <div class="logo">
     <img src="./assets/" alt="Trendy Treasures Logo" />
     <span>Trendy Treasures</span>
   </div>
   <ul class="nav-links">
-    <li>
-      <a href="#" class="nav-link">Add to Cart</a>
-    </li>
-    <li>
-      <a href="#" class="nav-link">Wishlist</a>
-    </li>
+    <li><a href="#" class="nav-link">Add to Cart</a></li>
+    <li><a href="#" class="nav-link">Wishlist</a></li>
   </ul>
 </nav>
 
-<div class="dropdown">
-  <button class="dropbtn">Sort by Category</button>
-  <div class="dropdown-content">
-    <a href="#" on:click={(e) => { e.preventDefault(); sortItems('electronics'); }}>Electronics</a>
-    <a href="#" on:click={(e) => { e.preventDefault(); sortItems("men's clothing"); }}>Men's Clothing</a>
-    <a href="#" on:click={(e) => { e.preventDefault(); sortItems("women's clothing"); }}>Women's Clothing</a>
-    <a href="#" on:click={(e) => { e.preventDefault(); sortItems('jewelery'); }}>Jewelry</a>
-  </div>
+<div class="sort-dropdown">
+  <button class={`sort-btn ${dropdownOpen ? 'active' : ''}`} on:click={toggleDropdown}>
+    Sort By {activeSort === 'default' ? '🔽' : activeSort === 'price' ? (activeCategory === 'highToLow' ? '🔼' : '🔽') : activeCategory}
+  </button>
+  {#if dropdownOpen}
+    <div class="sort-dropdown-content">
+      <a href="#" class={activeSort === 'default' ? 'active' : ''} on:click={(e) => { e.preventDefault(); sortItems('default'); }}>Default</a>
+      <a href="#" class={activeSort === 'category' && activeCategory === 'electronics' ? 'active' : ''} on:click={(e) => { e.preventDefault(); sortItems('category', 'electronics'); }}>Electronics</a>
+      <a href="#" class={activeSort === 'category' && activeCategory === 'mens clothing' ? 'active' : ''} on:click={(e) => { e.preventDefault(); sortItems('category', 'mens clothing'); }}>Men's Clothing</a>
+      <a href="#" class={activeSort === 'category' && activeCategory === 'womens clothing' ? 'active' : ''} on:click={(e) => { e.preventDefault(); sortItems('category', 'womens clothing'); }}>Women's Clothing</a>
+      <a href="#" class={activeSort === 'category' && activeCategory === 'jewelery' ? 'active' : ''} on:click={(e) => { e.preventDefault(); sortItems('category', 'jewelery'); }}>Jewelery</a>
+      <a href="#" class={activeSort === 'price' && activeCategory === 'highToLow' ? 'active' : ''} on:click={(e) => { e.preventDefault(); sortItems('price', 'highToLow'); }}>Price: High to Low</a>
+      <a href="#" class={activeSort === 'price' && activeCategory === 'lowToHigh' ? 'active' : ''} on:click={(e) => { e.preventDefault(); sortItems('price', 'lowToHigh'); }}>Price: Low to High</a>
+    </div>
+  {/if}
 </div>
 
 {#if isLoading}
@@ -61,8 +85,13 @@
   </div>
 {/if}
 
+
 <style>
-  
+   
+   .body{
+    background-color: #666;
+   }
+
  .navbar {
     position: fixed; 
     top: 0;
@@ -106,38 +135,59 @@
     color: #25a327;
   }
 
-  .dropdown {
+ /* CSS styles for the sort button and dropdown */
+
+.sort-dropdown {
   position: relative;
   display: inline-block;
-  margin: 20px;
-  margin-top: 35px; /* Add top margin */
-  margin-left: -auto; /* Align to the left side */
-  left: 20px;
 }
 
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #d9c8dc;
-    min-width: 5%;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-  }
+.sort-btn {
+  background-color: #653b73;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  margin-top: 35px;
+}
 
-  .dropdown-content a {
-    color: rgb(108, 77, 135);
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-  }
+.sort-btn.active {
+  background-color: #6845a0; /* Darker shade when active */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
-  .dropdown-content a:hover {
-    background-color: #f1f1f1;
-  }
+.sort-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
 
-  .dropdown:hover .dropdown-content {
-    display: block;
-  }
+.sort-dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.sort-dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.sort-dropdown-content a.active {
+  background-color: #ddd; /* Highlight active option */
+  font-weight: bold;
+}
+
+.sort-dropdown:hover .sort-dropdown-content {
+  display: block;
+}
+
 
   .card-container {
     display: flex;
