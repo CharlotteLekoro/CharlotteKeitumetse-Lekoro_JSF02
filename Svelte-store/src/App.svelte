@@ -2,23 +2,26 @@
   import { onMount } from 'svelte';
   let products = [];
   let isLoading = true;
+  let items = [];
+  let filteredItems = [];
 
   onMount(async () => {
     const response = await fetch('https://fakestoreapi.com/products');
     const data = await response.json();
     products = data;
     isLoading = false;
+    items = data;
+    filteredItems = items; // Display all items initially
   });
 
-  function navigateToImagePage(product) {
-    // Navigate to the image page with the product details
-    window.location.href = `/image/${product.id}`;
+  function sortItems(category) {
+    filteredItems = items.filter(item => item.category.toLowerCase() === category);
   }
 
 </script>
 <nav class="navbar">
   <div class="logo">
-    <img src="logo.png" alt="Trendy Treasures Logo" />
+    <img src="./assets/" alt="Trendy Treasures Logo" />
     <span>Trendy Treasures</span>
   </div>
   <ul class="nav-links">
@@ -30,13 +33,24 @@
     </li>
   </ul>
 </nav>
+
+<div class="dropdown">
+  <button class="dropbtn">Sort by Category</button>
+  <div class="dropdown-content">
+    <a href="#" on:click={(e) => { e.preventDefault(); sortItems('electronics'); }}>Electronics</a>
+    <a href="#" on:click={(e) => { e.preventDefault(); sortItems("men's clothing"); }}>Men's Clothing</a>
+    <a href="#" on:click={(e) => { e.preventDefault(); sortItems("women's clothing"); }}>Women's Clothing</a>
+    <a href="#" on:click={(e) => { e.preventDefault(); sortItems('jewelery'); }}>Jewelry</a>
+  </div>
+</div>
+
 {#if isLoading}
   <div class="loading-state">
     <p>Loading...</p>
   </div>
 {:else}
   <div class="card-container">
-    {#each products as product}
+    {#each filteredItems as product}
       <div class="card">
         <img src={product.image} alt={product.title} />
         <h2>{product.title}</h2>
@@ -46,22 +60,6 @@
     {/each}
   </div>
 {/if}
-<div class="card-container">
-  {#each products as product}
-    <div class="card" on:click={() => navigateToImagePage(product)}>
-      <img src={product.image} alt={product.title} />
-      <h2>{product.title}</h2>
-      <p>{product.description}</p>
-      <p>Price: ${product.price}</p>
-    </div>
-  {/each}
-</div>
-<!--<div class="image-page">
-  <img src={product.image} alt={product.title} />
-  <h2>{product.title}</h2>
-  <p>Price: ${product.price}</p>
-</div>-->
-
 
 <style>
   
@@ -106,6 +104,39 @@
 
  .nav-link:hover {
     color: #25a327;
+  }
+
+  .dropdown {
+  position: relative;
+  display: inline-block;
+  margin: 20px;
+  margin-top: 35px; /* Add top margin */
+  margin-left: -auto; /* Align to the left side */
+  left: 20px;
+}
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #d9c8dc;
+    min-width: 5%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+  }
+
+  .dropdown-content a {
+    color: rgb(108, 77, 135);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+
+  .dropdown-content a:hover {
+    background-color: #f1f1f1;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: block;
   }
 
   .card-container {
