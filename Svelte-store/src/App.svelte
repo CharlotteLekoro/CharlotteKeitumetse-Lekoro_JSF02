@@ -1,11 +1,13 @@
 <script>
   import { onMount } from 'svelte';
   let products = [];
+  let isLoading = true;
 
   onMount(async () => {
     const response = await fetch('https://fakestoreapi.com/products');
     const data = await response.json();
     products = data;
+    isLoading = false;
   });
 
   function navigateToImagePage(product) {
@@ -28,16 +30,22 @@
     </li>
   </ul>
 </nav>
-<div class="card-container">
-  {#each products as product}
-    <div class="card">
-      <img src={product.image} alt={product.title} />
-      <h2>{product.title}</h2>
-      <p>Price: ${product.price}</p>
-      <p>{product.category}</p>
-    </div>
-  {/each}
-</div>
+{#if isLoading}
+  <div class="loading-state">
+    <p>Loading...</p>
+  </div>
+{:else}
+  <div class="card-container">
+    {#each products as product}
+      <div class="card">
+        <img src={product.image} alt={product.title} />
+        <h2>{product.title}</h2>
+        <p>Price: ${product.price}</p>
+        <p>{product.category}</p>
+      </div>
+    {/each}
+  </div>
+{/if}
 <div class="card-container">
   {#each products as product}
     <div class="card" on:click={() => navigateToImagePage(product)}>
@@ -53,6 +61,7 @@
   <h2>{product.title}</h2>
   <p>Price: ${product.price}</p>
 </div>-->
+
 
 <style>
   
