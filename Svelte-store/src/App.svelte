@@ -7,6 +7,12 @@
     const data = await response.json();
     products = data;
   });
+
+  function navigateToImagePage(product) {
+    // Navigate to the image page with the product details
+    window.location.href = `/image/${product.id}`;
+  }
+
 </script>
 <nav class="navbar">
   <div class="logo">
@@ -32,6 +38,21 @@
     </div>
   {/each}
 </div>
+<div class="card-container">
+  {#each products as product}
+    <div class="card" on:click={() => navigateToImagePage(product)}>
+      <img src={product.image} alt={product.title} />
+      <h2>{product.title}</h2>
+      <p>{product.description}</p>
+      <p>Price: ${product.price}</p>
+    </div>
+  {/each}
+</div>
+<!--<div class="image-page">
+  <img src={product.image} alt={product.title} />
+  <h2>{product.title}</h2>
+  <p>Price: ${product.price}</p>
+</div>-->
 
 <style>
   
@@ -92,6 +113,7 @@
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
   }
 
   .card img {
@@ -121,4 +143,19 @@ body {
     background-color: #f8f8f8d1; /* Off-white background for the page */
     font-family: 'Lobster', cursive; /* Applying the fancy font to the body */
 }
+
+.image-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .image-page img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
 </style>
+
