@@ -28,17 +28,19 @@
       <img src={product.image} alt={product.title} />
       <h2>{product.title}</h2>
       <p>Price: ${product.price}</p>
+      <p>{product.category}</p>
     </div>
   {/each}
 </div>
 
 <style>
+  
  .navbar {
-    position: fixed; /* fix the navbar to the top of the page */
+    position: fixed; 
     top: 0;
     left: 0;
-    width: 100%; /* stretch across the whole page */
-    height: 60px; /* adjust the height to your liking */
+    width: 100%; 
+    height: 60px; 
     background-color: #653b73;
     color: #fff;
     display: flex;
@@ -101,12 +103,13 @@
   }
 
   .card h2 {
-    font-size: 18px;
+    font-size: 16px;
     margin-top: 10px;
   }
 
   .card p {
     font-size: 12px;
+    font-weight:bold;
     color: #666;
   }
 
