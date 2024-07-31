@@ -1,13 +1,21 @@
+/**
+ * Import onMount from Svelte
+ */
 <script>
   import { onMount } from 'svelte';
+  /**
+ * Initialize variables
+ */
   let products = [];
   let isLoading = true;
   let items = [];
   let filteredItems = [];
   let dropdownOpen = false;
-  let activeSort = 'default'; // Tracks the current sorting option
-  let activeCategory = ''; // Tracks the current category option
-
+  let activeSort = 'default'; 
+  let activeCategory = ''; 
+/**
+ * On mount, fetch products from API and set up initial state
+ */
   onMount(async () => {
     const response = await fetch('https://fakestoreapi.com/products');
     const data = await response.json();
@@ -16,7 +24,11 @@
     items = data;
     filteredItems = [...items]; // Display all items initially
   });
-
+/**
+ * Sort items based on option and sortBy
+ * @param {string} option - sorting option (default, category, price)
+ * @param {string} sortBy - category or price sorting option
+ */
   function sortItems(option, sortBy) {
     if (option === 'default') {
       filteredItems = [...items];
@@ -33,7 +45,9 @@
     activeCategory = sortBy; // Update the active category or price sorting
     dropdownOpen = false; // Close the dropdown after selection
   }
-
+/**
+ * Toggle dropdown open state
+ */
   function toggleDropdown() {
     dropdownOpen = !dropdownOpen;
   }
